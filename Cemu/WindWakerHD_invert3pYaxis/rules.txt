@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010143600,0005000010143500,0005000010143400
+name = Invert 3rd person Y axis
+path = "The Legend of Zelda: The Wind Waker HD/Graphics/Invert 3rd person camera Y axis"
+description = Inverts the Y axis of the third person view camera
+version = 6
