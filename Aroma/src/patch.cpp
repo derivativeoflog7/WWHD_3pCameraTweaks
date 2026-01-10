@@ -13,6 +13,8 @@
  */
 
 /*
+ * Modified by derivativeoflog7, 10 Jan 2026
+ *
  * Original code:
  * https://github.com/PretendoNetwork/Inkay/blob/fd06e2f2aaa8561f5379666d3af6c5781c56cef2/src/patches/game_peertopeer.cpp
  * https://github.com/PretendoNetwork/Inkay/blob/fd06e2f2aaa8561f5379666d3af6c5781c56cef2/src/utils/replace_mem.cpp
