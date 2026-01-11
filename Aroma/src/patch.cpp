@@ -132,7 +132,8 @@ PatchResult patch(bool undo) {
 
 
     DEBUG_FUNCTION_LINE_VERBOSE("Patching with undo = %s, offset = %08x, original = %08x, new = %08x",
-                                undo ? "true", "false",
+                                undo ? "true" : "false",
+                                offset,
                                 original,
                                 neww);
     return replace(offset, original, neww);
