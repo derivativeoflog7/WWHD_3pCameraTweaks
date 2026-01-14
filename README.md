@@ -1,7 +1,11 @@
-Invert the Y axis of the third person camera in TLOZ: The Wind Waker HD.  
+Tweaks for the third person camera in TLOZ: The Wind Waker HD. 
 For [Cemu](https://cemu.info/) and for [Aroma](https://aroma.foryour.cafe/).
 
 [GBAtemp thread](https://gbatemp.net/threads/cemu-aroma-tloz-the-wind-waker-hd-invert-3rd-person-camera-y-axis-patch.678754/#post-10799346), and [showcase video](https://youtu.be/bAeP5r48RNA) 
+
+# Patch list
+- Invert 3rd person camera Y axis (globally)
+- Consistent 3rd person camera Y axis: prevents the game from inverting the Y axis in certain places
 
 # Download and instructions
 Downloads are available in the [releases](https://github.com/derivativeoflog7/WWHD_invert3pYaxis/releases/latest) page, with usage instructions being present for both platforms in the downloads, or in this repo in their respective folder.  
