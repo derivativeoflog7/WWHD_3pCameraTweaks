@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #define LOG_APP_TYPE "P"
-#define LOG_APP_NAME "ExamplePlugin"
+#define LOG_APP_NAME "WWHD_3pCameraTweaks"
 
 #define __FILENAME__ ({                                \
     const char *__filename = __FILE__;                 \
