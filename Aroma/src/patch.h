@@ -15,7 +15,8 @@ typedef enum {
 } Region;
 
 typedef enum {
-    SIMPLE_REPLACEMENT_PATCH
+    SIMPLE_REPLACEMENT_PATCH,
+    JUMP_PATCH
 } PatchType;
 
 
@@ -33,9 +34,18 @@ typedef struct {
 } SimpleReplacementPatch;
 
 typedef struct {
-    PatchType patch_type;
+    BasePatch base_patch_data;
+    function_replacement_data_t function_replacement_data_JPN,
+        function_replacement_data_USA, function_replacement_data_EUR;
+    uint32_t original_function_call_location;
+    PatchedFunctionHandle patched_function_handle;
+} JumpPatch;
+
+typedef struct {
+    const PatchType patch_type;
     union {
         SimpleReplacementPatch simple_replacement_patch;
+        JumpPatch jump_patch;
     };
 } PatchArrayElement;
 

@@ -35,6 +35,10 @@
 
 #define RPL_NAME "cking.rpx"
 
+#define WWHD_TID_JPN 0x0005000010143400
+#define WWHD_TID_USA 0x0005000010143500
+#define WWHD_TID_EUR 0x0005000010143600
+
 #define INVERT_3P_Y_AXIS_JPN_OFFSET 0x004F9DB0
 #define INVERT_3P_Y_AXIS_USA_OFFSET 0x004F9DA8
 #define INVERT_3P_Y_AXIS_EUR_OFFSET 0x004F9DAC
@@ -42,13 +46,18 @@
 #define INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION    0xFFA00890 // fmr  f29,f1
 #define INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION 0xFFA00850 // fneg f29,f1
 
-#define CONSISTENT_3P_Y_AXIS_JPN_OFFSET 0x005102EC
-#define CONSISTENT_3P_Y_AXIS_USA_OFFSET 0x005102E4
-#define CONSISTENT_3P_Y_AXIS_EUR_OFFSET 0x005102E8
+/*
+ * We're actually replacing the instruction *after* the lfs that loads the right stick Y position
+ * This is because we use FunctionPatcher to run custom code, then run the original instruction before ultimately jumping back to the game code
+ * If we did that with the previously mentioned instruction, we would just undo all the work
+ */
+#define CONSISTENT_3P_Y_AXIS_JPN_OFFSET 0x005102F0
+#define CONSISTENT_3P_Y_AXIS_USA_OFFSET 0x005102E8
+#define CONSISTENT_3P_Y_AXIS_EUR_OFFSET 0x025102EC
 
 #define CONSISTENT_3P_Y_AXIS_ORIGINAL_INSTRUCTION 0xC19F0174 // lfs f12, +0x174(r31)
 
-
+// =====Strings=====
 #define DEBUG_MESSAGE_RESETTING_IS_APPLIED                  "Resetting is_applied for %s"
 #define DEBUG_MESSAGE_WRONG_TID                             "Not in WWHD"
 #define DEBUG_MESSAGE_LOOKING_FOR_RPL                       "Looking for %s"
@@ -65,6 +74,7 @@
 #define APPLY                                               "Applying"
 #define UNDO                                                "Undoing"
 #define DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH        "%s simple replacement patch %s at address %08x"
+#define DEBUG_MESSAGE_DOING_JUMP_PATCH                      "%s simple replacement patch %s"
 #define DEBUG_MESSAGE_SUCCESS                               "%s %s succeeded"
 
 #define FAIL                                                "%s %s FAILED! "
@@ -76,6 +86,7 @@
 #define DEBUG_MESSAGE_FAIL_ORIGINAL_VALUE_MISMATCH FAIL     "Original value mismatch" _MISMATCH
 #define DEBUG_MESSAGE_FAIL_VALUE_NOT_UPDATED FAIL           "Value did not update" _MISMATCH
 #define DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS FAIL        "patched_instruction_address is NULL"
+#define DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR FAIL      "FunctionPatcher returned %s"
 
 #define CONSISTENT_3P_Y_AXIS_MACHINE_CODE (uint32_t){ \
     0xC19F0174, // lfs   f12, +0x174(r31) | Load right stick Y position (original game code) \
@@ -92,12 +103,18 @@
     0x4E800020  // blr                    | Return to original game code \
 }
 
+// =====Function prototypes=====
 uint32_t get_rpl_text_address(const char name[]);
 bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_final, const char *debug_prefix, const char *SETTING_ID);
 bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rpl_text_address, Region region);
 bool force_undo_simple_replacement_patch(SimpleReplacementPatch *patch_p);
+bool apply_jump_patch(JumpPatch *patch_p, Region region);
+bool force_undo_jump_patch(JumpPatch *patch_p);
 bool apply_patch_from_array(PatchArrayElement *element_p, uint32_t rpl_text_address, Region region);
 bool force_undo_patch_from_array(PatchArrayElement *element_p);
+bool already_done(BasePatch base_patch_data);
+bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix);
+extern void consistent3pYaxis_custom_code();
 
 // =====Macros=====
 #define _MAKE_BASE_PATCH_DATA( \
@@ -142,11 +159,13 @@ bool force_undo_patch_from_array(PatchArrayElement *element_p);
     } \
 )
 
+
+
 // =====game_patches INITIALIZED HERE======
 GamePatches game_patches = MAKE_GAME_PATCHES(
-    0x0005000010143400, 0x0005000010143500, 0x0005000010143600, "cking.rpx",
+    WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR, "cking.rpx",
     MAKE_SIMPLE_REPLACEMENT_PATCH_ENTRY(
-        "invert3pYaxes",
+        "invert3pYaxis",
         "Invert 3rd person camera Y axis",
         false,
         INVERT_3P_Y_AXIS_JPN_OFFSET,
@@ -154,7 +173,20 @@ GamePatches game_patches = MAKE_GAME_PATCHES(
         INVERT_3P_Y_AXIS_EUR_OFFSET,
         INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION,
         INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION
-    )
+    ),
+    (PatchArrayElement) {
+        .patch_type = JUMP_PATCH,
+        .jump_patch = (JumpPatch){
+            .base_patch_data = _MAKE_BASE_PATCH_DATA(
+                "consistent3pYaxis",
+                "Consistent 3rd person camera Y axis",
+                false,
+                CONSISTENT_3P_Y_AXIS_JPN_OFFSET,
+                CONSISTENT_3P_Y_AXIS_USA_OFFSET,
+                CONSISTENT_3P_Y_AXIS_EUR_OFFSET
+            ),
+        }
+    }
 );
 
 // =====Externally accessible functions=====
@@ -162,9 +194,11 @@ inline BasePatch *get_base_patch_data_p (PatchArrayElement *element_p) {
     switch (element_p->patch_type) {
         case SIMPLE_REPLACEMENT_PATCH:
             return &element_p->simple_replacement_patch.base_patch_data;
+        case JUMP_PATCH:
+            return &element_p->jump_patch.base_patch_data;
     }
 
-    return NULL;
+    return NULL; //gcc complains otherwise
 }
 
 int apply_game_patches(GamePatches *game_patches_p, const uint64_t tid) {
@@ -207,6 +241,19 @@ void unset_is_applied(GamePatches *game_patches_p) {
 }
 
 // =====Internal functions=====
+bool already_done(BasePatch base_patch_data) {
+    if (base_patch_data.is_enabled && base_patch_data.is_applied) {
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_ENABLED_AND_APPLIED, base_patch_data.SETTING_ID);
+        return true;
+    }
+
+    if (!(base_patch_data.is_enabled || base_patch_data.is_applied)) {
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DISABLED_NOT_APPLIED, base_patch_data.SETTING_ID);
+        return true;
+    }
+    return false;
+}
+
 uint32_t get_rpl_text_address(const char name[]) {
     DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_LOOKING_FOR_RPL, name);
     int32_t num_rpls;
@@ -279,20 +326,14 @@ bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_
 bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rpl_text_address, Region region) {
     BasePatch *base_patch_data_p = &patch_p->base_patch_data;
 
-    if (base_patch_data_p->is_enabled && base_patch_data_p->is_applied) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_ENABLED_AND_APPLIED, base_patch_data_p->SETTING_ID);
+    if (already_done(*base_patch_data_p))
         return true;
-    }
-
-    if (!(base_patch_data_p->is_enabled || base_patch_data_p->is_applied)) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DISABLED_NOT_APPLIED, base_patch_data_p->SETTING_ID);
-        return true;
-    }
 
     uint32_t *address_p, exp_initial, exp_final;
     char *debug_prefix;
 
-    if (base_patch_data_p->is_enabled && !base_patch_data_p->is_applied) {
+    if (base_patch_data_p->is_enabled) {
+        // Apply
         uint32_t offset;
 
         switch (region) {
@@ -314,6 +355,7 @@ bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rp
         exp_final = patch_p->REPLACEMENT_INSTRUCTION;
         address_p = (uint32_t*)(rpl_text_address + offset);
     } else {
+        // Undo
         debug_prefix = UNDO;
         exp_initial = patch_p->REPLACEMENT_INSTRUCTION;
         exp_final = patch_p->ORIGINAL_INSTRUCTION;
@@ -342,6 +384,82 @@ bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rp
     return true;
 }
 
+bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix) {
+    switch (function_patcher_status) {
+        case FUNCTION_PATCHER_RESULT_SUCCESS:
+            DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_SUCCESS, debug_prefix, SETTING_ID);
+            return true;
+        case FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND");
+            break;
+        case FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT");
+            break;
+        case FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION");
+            break;
+        case FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT");
+            break;
+        case FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND");
+            break;
+        case FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION");
+            break;
+        case FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED");
+            break;
+        case FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND");
+            break;
+        case FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR");
+            break;
+    }
+    return false;
+}
+
+bool apply_jump_patch(JumpPatch *patch_p, Region region) {
+    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+
+    if (already_done(*base_patch_data_p))
+        return true;
+
+    function_replacement_data_t *target_function_replacement_data;
+
+    switch (region) {
+        case JPN:
+            target_function_replacement_data = &patch_p->function_replacement_data_JPN;
+            break;
+        case USA:
+            target_function_replacement_data = &patch_p->function_replacement_data_USA;
+            break;
+        case EUR:
+            target_function_replacement_data = &patch_p->function_replacement_data_EUR;
+            break;
+        default:
+            return false;
+    }
+
+    FunctionPatcherStatus res;
+    char *debug_prefix;
+    if (base_patch_data_p->is_enabled) {
+        // Apply
+        debug_prefix = APPLY;
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, base_patch_data_p->SETTING_ID);
+        res = FunctionPatcher_AddFunctionPatch(target_function_replacement_data, &patch_p->patched_function_handle, &base_patch_data_p->is_applied);
+    } else {
+        // Undo
+        debug_prefix = UNDO;
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, base_patch_data_p->SETTING_ID);
+        if ((res = FunctionPatcher_RemoveFunctionPatch(patch_p->patched_function_handle)) == FUNCTION_PATCHER_RESULT_SUCCESS)
+            base_patch_data_p->is_applied = false;
+    }
+
+    return jump_patch_return_and_log(res, base_patch_data_p->SETTING_ID, debug_prefix);
+}
+
 bool force_undo_simple_replacement_patch(SimpleReplacementPatch *patch_p) {
     BasePatch *base_patch_data_p = &patch_p->base_patch_data;
 
@@ -364,11 +482,28 @@ bool force_undo_simple_replacement_patch(SimpleReplacementPatch *patch_p) {
     return true;
 }
 
+bool force_undo_jump_patch(JumpPatch *patch_p) {
+    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+
+    if (!base_patch_data_p->is_applied) {
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_NOT_APPLIED, base_patch_data_p->SETTING_ID);
+        return true;
+    }
+
+    FunctionPatcherStatus res;
+    if ((res = FunctionPatcher_RemoveFunctionPatch(patch_p->patched_function_handle)) == FUNCTION_PATCHER_RESULT_SUCCESS)
+        base_patch_data_p->is_applied = false;
+
+    return jump_patch_return_and_log(res, base_patch_data_p->SETTING_ID, UNDO);
+}
+
 
 bool apply_patch_from_array(PatchArrayElement *element_p, uint32_t rpl_text_address, Region region) {
     switch (element_p->patch_type) {
         case SIMPLE_REPLACEMENT_PATCH:
             return apply_simple_replacement_patch(&element_p->simple_replacement_patch, rpl_text_address, region);
+        case JUMP_PATCH:
+            return apply_jump_patch(&element_p->jump_patch, region);
     }
 
     return false; //gcc complains otherwise
@@ -378,7 +513,11 @@ bool force_undo_patch_from_array(PatchArrayElement *element_p) {
     switch (element_p->patch_type) {
         case SIMPLE_REPLACEMENT_PATCH:
             return force_undo_simple_replacement_patch(&element_p->simple_replacement_patch);
+        case JUMP_PATCH:
+            return force_undo_jump_patch(&element_p->jump_patch);
     }
+
+    return false; //gcc complains otherwise
 }
 
 
