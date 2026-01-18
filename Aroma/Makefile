@@ -29,7 +29,7 @@ INCLUDES	:=	src
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
-OPT	:=  	-fno-asynchronous-unwind-tables -O3
+OPT	:=  	-fno-asynchronous-unwind-tables -O2
 CFLAGS	:=	-g -Wall -ffunction-sections -fdata-sections \
 			$(MACHDEP) $(OPT)
 
