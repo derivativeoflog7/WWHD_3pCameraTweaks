@@ -6,7 +6,9 @@
 #include "patches/game_patches.h"
 #include "settings.h"
 #include <coreinit/title.h>
+#include <coreinit/filesystem.h>
 #include <wups.h>
+#include <wups/storage.h>
 #include <wups/config/WUPSConfigItemBoolean.h>
 #include <wups/config/WUPSConfigItemStub.h>
 

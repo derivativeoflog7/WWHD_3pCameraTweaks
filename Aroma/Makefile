@@ -29,8 +29,8 @@ INCLUDES	:=	src
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
-#OPT	:=  -Os -fno-asynchronous-unwind-tables
-CFLAGS	:=	-g -O2 -Wall -ffunction-sections -fdata-sections \
+OPT	:=  	-fno-asynchronous-unwind-tables -O3
+CFLAGS	:=	-g -Wall -ffunction-sections -fdata-sections \
 			$(MACHDEP) $(OPT)
 
 CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__  -std=gnu23
@@ -40,7 +40,7 @@ CXXFLAGS	:= $(CFLAGS)
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(OPT) $(RPXSPECS) -Wl,-Map,$(notdir $*.map) $(WUPSSPECS) -Wl,-gc-sections,-T$(WUMS_ROOT)/share/libkernel.ld
 
-LIBS	:= -lwups -lwut -lkernel -lfunctionpatcher
+LIBS	:= 	-lwups -lwut -lkernel -lfunctionpatcher
 
 ifeq ($(DEBUG),1)
 CXXFLAGS += -DDEBUG -g

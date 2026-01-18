@@ -1,17 +1,20 @@
 #include "common.h"
 #include "patches/game_patches.h"
+#include "patches/jump_patch.h"
 #include "patches/simple_replacement_patch.h"
 #include "patches/patch_array_element.h"
 #include "settings.h"
 #include <coreinit/filesystem.h>
 #include <coreinit/title.h>
+#include <function_patcher/fpatching_defines.h>
 #include <stdlib.h>
 #include <wups.h>
 
 #define DEBUG_MESSAGE_INIT_PLUGIN           "Initializing %s"
 #define DEBUG_MESSAGE_STARTED_APPLICATION   "Started application with TID %08llx"
 #define DEBUG_MESSAGE_DEINIT_PLUGIN         "Deinitializing %s"
-#define DEBUG_MESSAGE_INIT_PATCHER_FAIL     "Failed to initliazile FunctionPatcher"
+#define DEBUG_MESSAGE_INIT_PATCHER_SUCESS   "Initialized FunctionPatcher"
+#define DEBUG_MESSAGE_INIT_PATCHER_FAIL     "Failed to initliazile FunctionPatcher! %s"
 
 WUPS_PLUGIN_NAME(PLUGIN_NAME);
 WUPS_PLUGIN_DESCRIPTION(PLUGIN_DESCRIPTION);
@@ -23,8 +26,7 @@ WUPS_USE_WUT_DEVOPTAB();
 WUPS_USE_STORAGE(PLUGIN_CONFIG_ID);
 
 extern void consistent3pYaxis_custom_code();
-
-
+uint32_t consistent3pYaxis_return_call = 0;
 
 GamePatches game_patches = GENERATE_GAME_PATCHES(
     WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR, WWHD_EXECUTABLE_NAME,
@@ -32,89 +34,51 @@ GamePatches game_patches = GENERATE_GAME_PATCHES(
         "invert3pYaxis", "Invert Y axis", false,
         INVERT_3P_Y_AXIS_JPN_OFFSET, INVERT_3P_Y_AXIS_USA_OFFSET, INVERT_3P_Y_AXIS_EUR_OFFSET,
         INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION, INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION
-    )
-    /*GENERATE_JUMP_PATCH_ENTRY(
+    ),
+    GENERATE_JUMP_PATCH_ENTRY(
         "consistent3pYaxis", "Consistent Y axis", false,
-        CONSISTENT_3P_Y_AXIS_JPN_OFFSET, CONSISTENT_3P_Y_AXIS_USA_OFFSET,CONSISTENT_3P_Y_AXIS_EUR_OFFSET,
-        WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR,
-        WWHD_EXECUTABLE_NAME, &consistent3pYaxis_custom_code
-    )*/
+        CONSISTENT_3P_Y_AXIS_JPN_OFFSET, CONSISTENT_3P_Y_AXIS_USA_OFFSET, CONSISTENT_3P_Y_AXIS_EUR_OFFSET,
+        WWHD_EXECUTABLE_NAME, WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR,
+        consistent3pYaxis_custom_code, consistent3pYaxis_return_call
+    )
 );
-
-
-/*void generate_patches() {
-    GamePatches game_patches = (GamePatches) {
-        .TID_JPN = WWHD_TID_JPN,
-        .TID_USA = WWHD_TID_USA,
-        .TID_EUR = WWHD_TID_EUR,
-        .EXECUTABLE_NAME = WWHD_EXECUTABLE_NAME,
-        .NUM_PATCHES = 2,
-        .patches = (PatchArrayElement*)malloc(2 * sizeof(PatchArrayElement))
-    };
-
-    GamePatches2 gp2 = (GamePatches2) {
-        .TID_JPN = WWHD_TID_JPN,
-        .TID_USA = WWHD_TID_USA,
-        .TID_EUR = WWHD_TID_EUR,
-        .EXECUTABLE_NAME = WWHD_EXECUTABLE_NAME,
-        .NUM_PATCHES = 2
-    };
-
-    PatchArrayElement invert3pYaxis = GENERATE_SIMPLE_REPLACEMENT_PATCH_ENTRY(
-        "invert3pYaxis", "Invert 3rd person camera Y axis", false,
-        INVERT_3P_Y_AXIS_JPN_OFFSET,
-        INVERT_3P_Y_AXIS_USA_OFFSET,
-        INVERT_3P_Y_AXIS_EUR_OFFSET,
-        INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION,
-        INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION
-    );
-    memcpy(&game_patches.patches[0], &invert3pYaxis, sizeof(PatchArrayElement));
-    memcpy(&gp2.patches[0], &invert3pYaxis, sizeof(PatchArrayElement));
-
-    PatchArrayElement consistent3pYaxis = generate_jump_patch_array_element(
-        "consistent3pYaxis", "Consistent 3rd person camera Y axis", false,
-        CONSISTENT_3P_Y_AXIS_JPN_OFFSET,
-        CONSISTENT_3P_Y_AXIS_USA_OFFSET,
-        CONSISTENT_3P_Y_AXIS_EUR_OFFSET,
-        WWHD_TID_JPN,
-        WWHD_TID_USA,
-        WWHD_TID_EUR,
-        WWHD_EXECUTABLE_NAME,
-        NULL
-    );
-    memcpy(&game_patches.patches[1], &consistent3pYaxis, sizeof(PatchArrayElement));
-    memcpy(&gp2.patches[1], &consistent3pYaxis, sizeof(PatchArrayElement));
-}*/
-
-void on_application_start() {
-    uint64_t tid = OSGetTitleID();
-    DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_STARTED_APPLICATION, tid);
-    unset_is_applied(&game_patches);
-    apply_game_patches(&game_patches, tid);
-}
-
-void deinitialize_plugin() {
-    DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DEINIT_PLUGIN, PLUGIN_NAME);
-    force_undo_game_paches(&game_patches);
-}
-
 
 INITIALIZE_PLUGIN() {
     initLogging();
     DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_INIT_PLUGIN, PLUGIN_NAME);
-    //generate_patches();
     initConfig();
+    switch (FunctionPatcher_InitLibrary()) {
+        case FUNCTION_PATCHER_RESULT_SUCCESS:
+            DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_INIT_PATCHER_SUCESS);
+            break;
+        case FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_INIT_PATCHER_FAIL, "FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND");
+            break;
+        case FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_INIT_PATCHER_FAIL, "FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT");
+            break;
+        case FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION:
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_INIT_PATCHER_FAIL, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION");
+            break;
+        default: //Avoids gcc complaining about unhandled cases
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_INIT_PATCHER_FAIL, "Unknown error!!");
+    }
     deinitLogging();
 }
 
 DEINITIALIZE_PLUGIN() {
-    deinitialize_plugin();
+    DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DEINIT_PLUGIN, PLUGIN_NAME);
+    force_undo_game_paches(&game_patches);
+    FunctionPatcher_DeInitLibrary();
     deinitLogging();
 }
 
 ON_APPLICATION_START() {
     initLogging();
-    on_application_start();
+    uint64_t tid = OSGetTitleID();
+    DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_STARTED_APPLICATION, tid);
+    unset_is_applied(&game_patches);
+    apply_game_patches(&game_patches, tid);
 }
 
 ON_APPLICATION_ENDS() {
