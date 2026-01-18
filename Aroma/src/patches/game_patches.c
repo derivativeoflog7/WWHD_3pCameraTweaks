@@ -1,4 +1,13 @@
+#include "../utils/logger.h"
+#include "base_patch.h"
 #include "game_patches.h"
+#include "jump_patch.h"
+#include "patch_array_element.h"
+#include "patches_common_internal.h"
+#include "patch_strings_internal.h"
+#include "simple_replacement_patch.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 int apply_game_patches(GamePatches *game_patches_p, const uint64_t tid) {
     Region region;

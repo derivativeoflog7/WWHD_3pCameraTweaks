@@ -32,4 +32,6 @@
 
 #define CONSISTENT_3P_Y_AXIS_ORIGINAL_INSTRUCTION 0xC19F0174 // lfs f12, +0x174(r31)
 
-#define NUM_PATCHES_ 1
+typedef enum {
+    JPN, USA, EUR
+} Region;

@@ -1,8 +1,8 @@
 #include "common.h"
-#include "game_patches.h"
-#include "patch_array_element.h"
+#include "patches/game_patches.h"
+#include "patches/simple_replacement_patch.h"
+#include "patches/patch_array_element.h"
 #include "settings.h"
-#include "simple_replacement_patch.h"
 #include <coreinit/filesystem.h>
 #include <coreinit/title.h>
 #include <stdlib.h>
@@ -32,13 +32,13 @@ GamePatches game_patches = GENERATE_GAME_PATCHES(
         "invert3pYaxis", "Invert Y axis", false,
         INVERT_3P_Y_AXIS_JPN_OFFSET, INVERT_3P_Y_AXIS_USA_OFFSET, INVERT_3P_Y_AXIS_EUR_OFFSET,
         INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION, INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION
-    ),
-    GENERATE_JUMP_PATCH_ENTRY(
+    )
+    /*GENERATE_JUMP_PATCH_ENTRY(
         "consistent3pYaxis", "Consistent Y axis", false,
         CONSISTENT_3P_Y_AXIS_JPN_OFFSET, CONSISTENT_3P_Y_AXIS_USA_OFFSET,CONSISTENT_3P_Y_AXIS_EUR_OFFSET,
         WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR,
         WWHD_EXECUTABLE_NAME, &consistent3pYaxis_custom_code
-    )
+    )*/
 );
 
 

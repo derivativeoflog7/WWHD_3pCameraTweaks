@@ -22,7 +22,7 @@ WUMS_ROOT := $(DEVKITPRO)/wums
 #-------------------------------------------------------------------------------
 TARGET		:=	WWHD_3pCameraTweaks
 BUILD		:=	build
-SOURCES		:=	src src/utils
+SOURCES		:=	src src/utils src/patches
 DATA		:=	data
 INCLUDES	:=	src
 

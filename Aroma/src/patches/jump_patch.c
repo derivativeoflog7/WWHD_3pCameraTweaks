@@ -1,7 +1,13 @@
+#include "../utils/logger.h"
+#include "base_patch.h"
+#include "base_patch_internal.h"
 #include "jump_patch.h"
+#include "jump_patch_internal.h"
+#include "patches_common_internal.h"
+#include "patch_strings_internal.h"
 #include <function_patcher/function_patching.h>
-
-#define DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR FAIL      "FunctionPatcher returned %s"
+#include <stdbool.h>
+#include <stdint.h>
 
 bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix);
 

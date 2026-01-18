@@ -1,6 +1,10 @@
 #pragma once
+#include "base_patch.h"
+#include "jump_patch.h"
 #include "patch_array_element.h"
-#include "common.h"
+#include "patch_array_element_internal.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
     const uint64_t TID_JPN, TID_USA, TID_EUR;
@@ -8,13 +12,6 @@ typedef struct {
     const int NUM_PATCHES;
     PatchArrayElement patches[];
 } GamePatches;
-
-typedef struct {
-    const uint64_t TID_JPN, TID_USA, TID_EUR;
-    const char *EXECUTABLE_NAME;
-    const int NUM_PATCHES;
-    PatchArrayElement patches[2];
-} GamePatches2;
 
 int apply_game_patches(GamePatches *game_patches_p, const uint64_t tid);
 int force_undo_game_paches(GamePatches *game_patches_p);
@@ -34,18 +31,5 @@ extern GamePatches game_patches;
         .EXECUTABLE_NAME = (executable_name), \
         .NUM_PATCHES = (int)(sizeof((PatchArrayElement[]){ __VA_ARGS__ }) / sizeof(PatchArrayElement)), \
         .patches = { __VA_ARGS__ } \
-    } \
-)
-
-#define GENERATE_GAME_PATCHES_INSTANCE( \
-    tid_jpn, tid_usa, tid_eur, \
-    executable_name, num_patches \
-) ( \
-    (GamePatches){ \
-        .TID_JPN = (tid_jpn), \
-        .TID_USA = (tid_usa), \
-        .TID_EUR = (tid_eur), \
-        .EXECUTABLE_NAME = (executable_name), \
-        .NUM_PATCHES = (num_patches) \
     } \
 )

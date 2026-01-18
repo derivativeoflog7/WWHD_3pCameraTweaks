@@ -2,7 +2,8 @@
  * https://github.com/wiiu-env/WiiUPluginSystem/blob/a789f3234e95795cc6578e5ba66dea0fa1e0c7c3/plugins/example_plugin_cpp/src/main.cpp
  */
 
-#include "game_patches.h"
+#include "patches/base_patch.h"
+#include "patches/game_patches.h"
 #include "settings.h"
 #include <coreinit/title.h>
 #include <wups.h>

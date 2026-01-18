@@ -1,27 +1,31 @@
-#include "base_patch.h"
+/*  Copyright 2024 Pretendo Network contributors <pretendo.network>
+ *  Copyright 2024 Ash Logan <ash@heyquark.com>
+ *
+ *  Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby
+ *  granted, provided that the above copyright notice and this permission notice appear in all copies.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ *  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ *  IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *  PERFORMANCE OF THIS SOFTWARE.
+ */
+
+/*
+ * Modified/adapted by derivativeoflog7, 2026
+ *
+ * Original code:
+ * https://github.com/PretendoNetwork/Inkay/blob/fd06e2f2aaa8561f5379666d3af6c5781c56cef2/src/utils/rpl_info.cpp
+ * https://github.com/PretendoNetwork/Inkay/blob/fd06e2f2aaa8561f5379666d3af6c5781c56cef2/src/utils/rpl_info.h
+ */
+
+#include "../utils/logger.h"
+#include "patches_common_internal.h"
+#include "patch_strings_internal.h"
 #include <coreinit/dynload.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
-
-#define DEBUG_MESSAGE_LOOKING_FOR_RPL                       "Looking for %s"
-#define DEBUG_MESSAGE_RPL_TEXT_ADDRESS                      "%s text address is at %08x"
-
-#define DEBUG_MESSAGE_FAIL_GetNumberOfRPLs                  "OSDynLoad_GetNumberOfRPLs failed"
-#define DEBUG_MESSAGE_FAIL_malloc                           "malloc failed"
-#define DEBUG_MESSAGE_FAIL_GetRPLInfo                       "OSDynLoad_GetRPLInfo failed"
-#define DEBUG_MESSAGE_FAIL_RPL_NOT_FOUND                    "RPL not found"
-
-bool already_done(BasePatch base_patch_data) {
-    if (base_patch_data.is_enabled && base_patch_data.is_applied) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_ENABLED_AND_APPLIED, base_patch_data.SETTING_ID);
-        return true;
-    }
-
-    if (!(base_patch_data.is_enabled || base_patch_data.is_applied)) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DISABLED_NOT_APPLIED, base_patch_data.SETTING_ID);
-        return true;
-    }
-    return false;
-}
 
 uint32_t get_rpl_text_address(const char name[]) {
     DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_LOOKING_FOR_RPL, name);
@@ -66,4 +70,3 @@ uint32_t get_rpl_text_address(const char name[]) {
     DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_RPL_TEXT_ADDRESS, &rpl.name[rpl_name_len - patch_exec_name_len], rpl.textAddr);
     return rpl.textAddr;
 }
-
