@@ -34,8 +34,8 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
         .patch_type = SIMPLE_REPLACEMENT_PATCH, \
         .simple_replacement_patch = (SimpleReplacementPatch) { \
             .base_patch_data = _GENERATE_BASE_PATCH_ENTRY( \
-            (setting_id), (menu_text), (is_enabled_default), \
-            (offset_jpn), (offset_usa), (offset_eur) \
+                (setting_id), (menu_text), (is_enabled_default), \
+                (offset_jpn), (offset_usa), (offset_eur) \
             ), \
             .ORIGINAL_INSTRUCTION = (original_instruction), \
             .REPLACEMENT_INSTRUCTION = (replacement_instruction), \
@@ -44,6 +44,8 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
     } \
 )
 
+// libfunctionpatcher requires having the TID(s) in the struct, so we have no choice but pass them to it
+// This also makes the TID check by this plugin redundant for jump patches, oh well...
 #define GENERATE_JUMP_PATCH_ENTRY( \
     setting_id, menu_text, is_enabled_default, \
     offset_jpn, offset_usa, offset_eur, executable_name, \
@@ -63,14 +65,14 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
                 .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
                 .physicalAddr  = 0, /*Unused*/ \
                 .virtualAddr   = 0, /*Unused*/ \
-                .replaceAddr   = (uint32_t)&(replacement_function), \
-                .replaceCall   = &(replace_call_variable), \
+                .replaceAddr   = (uint32_t)&(replacement_function), /*Address of replacement function*/ \
+                .replaceCall   = &(replace_call_variable), /*Pointer to code containing original instruction + jump back to original code*/ \
                 .targetProcess = FP_TARGET_PROCESS_ALL, \
                 .ReplaceInRPX  = { \
                     .targetTitleIds      = (uint64_t[]){(tid_jpn)}, \
                     .targetTitleIdsCount = 1, \
-                    .versionMin          = 0, /* Ignore version as WWHD was never updated anyway*/ \
-                    .versionMax          = 0xFFFF, \
+                    .versionMin          = 0, /*Ignore version as WWHD was never updated anyway*/ \
+                    .versionMax          = 0xFFFF, /*Same as above*/ \
                     .executableName      = (executable_name), \
                     .textOffset          = (offset_jpn), \
                     .functionName        = NULL /*Unused*/ \

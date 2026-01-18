@@ -31,12 +31,12 @@ uint32_t consistent3pYaxis_return_call = 0;
 GamePatches game_patches = GENERATE_GAME_PATCHES(
     WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR, WWHD_EXECUTABLE_NAME,
     GENERATE_SIMPLE_REPLACEMENT_PATCH_ENTRY(
-        "invert3pYaxis", "Invert Y axis", false,
+        "invert3pYaxis", "Invert 3rd person camera Y axis", false,
         INVERT_3P_Y_AXIS_JPN_OFFSET, INVERT_3P_Y_AXIS_USA_OFFSET, INVERT_3P_Y_AXIS_EUR_OFFSET,
         INVERT_3P_Y_AXIS_ORIGINAL_INSTRUCTION, INVERT_3P_Y_AXIS_REPLACEMENT_INSTRUCTION
     ),
     GENERATE_JUMP_PATCH_ENTRY(
-        "consistent3pYaxis", "Consistent Y axis", false,
+        "consistent3pYaxis", "Consistent 3rd person camera Y axis", false,
         CONSISTENT_3P_Y_AXIS_JPN_OFFSET, CONSISTENT_3P_Y_AXIS_USA_OFFSET, CONSISTENT_3P_Y_AXIS_EUR_OFFSET,
         WWHD_EXECUTABLE_NAME, WWHD_TID_JPN, WWHD_TID_USA, WWHD_TID_EUR,
         consistent3pYaxis_custom_code, consistent3pYaxis_return_call
