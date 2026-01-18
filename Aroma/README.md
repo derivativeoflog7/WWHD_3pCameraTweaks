@@ -41,7 +41,7 @@ It's possible to use a docker image for building. This way you don't need anythi
 
 ```
 # Build docker image (only needed once)
-docker build . -t WWHD_3pCameraTweaks-builder
+docker build . -t wwhd_3pcameratweaks-builder
 
 # make 
 docker run -it --rm -v ${PWD}:/project WWHD_3pCameraTweaks-builder make
