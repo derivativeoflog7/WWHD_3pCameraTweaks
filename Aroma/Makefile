@@ -33,9 +33,9 @@ INCLUDES	:=	src
 CFLAGS	:=	-g -O2 -Wall -ffunction-sections -fdata-sections \
 			$(MACHDEP) $(OPT)
 
-CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__  -std=c23
+CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__  -std=gnu23
 
-CXXFLAGS	:= $(CFLAGS) -std=c++20
+CXXFLAGS	:= $(CFLAGS) 
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(OPT) $(RPXSPECS) -Wl,-Map,$(notdir $*.map) $(WUPSSPECS) -Wl,-gc-sections,-T$(WUMS_ROOT)/share/libkernel.ld

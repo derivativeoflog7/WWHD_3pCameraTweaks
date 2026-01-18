@@ -2,11 +2,9 @@
  * https://github.com/wiiu-env/WiiUPluginSystem/blob/a789f3234e95795cc6578e5ba66dea0fa1e0c7c3/plugins/example_plugin_cpp/src/main.cpp
  */
 
-#include "common.h"
-#include "patch.h"
-#include "utils/logger.h"
+#include "game_patches.h"
 #include "settings.h"
-#include <stdlib.h>
+#include <coreinit/title.h>
 #include <wups.h>
 #include <wups/config/WUPSConfigItemBoolean.h>
 #include <wups/config/WUPSConfigItemStub.h>
