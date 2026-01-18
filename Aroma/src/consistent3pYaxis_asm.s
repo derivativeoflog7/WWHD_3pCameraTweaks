@@ -9,7 +9,8 @@ consistent3pYaxis_custom_code:
    bge skip                # If true, negate the right stick Y position, otherwise do nothing
    fneg %f12, %f12
 skip:
-   # Build and execute jump to the replaced instruction and ultimate jump back to the game's code
+   # Build and execute jump to the replaced instruction, which is followed by an ultimate jump back to the game's code
+   # r11 should also be safe to use, as the game code eventually overrides it, and all codepaths up to that don't seem to use it
    lis     %r11, consistent3pYaxis_return_call@ha
    lwz     %r11, consistent3pYaxis_return_call@l(%r11)
    mtctr   %r11
