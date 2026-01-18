@@ -3,6 +3,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * Returns true if a patch is enabled and applied, or if it's disabled and not applied; in either case it generates a verbose debugging line
+ * @param base_patch_data BasePatch of patch to evaluate
+ * @return boolean value indicating if either case is true
+ */
 bool already_done(BasePatch base_patch_data);
 
 #define _GENERATE_BASE_PATCH_ENTRY( \

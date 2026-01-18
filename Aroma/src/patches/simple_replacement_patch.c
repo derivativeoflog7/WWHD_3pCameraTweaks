@@ -36,6 +36,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * Replace a single dword at a given address, but only if it matches the expected initial address
+ * @param address_p Address of dwrod to replace
+ * @param exp_initial Expected initial value
+ * @param exp_final Value to put
+ * @param debug_prefix Debug prefix for debugging lines
+ * @param SETTING_ID setting_id of patch, for debugging lines
+ * @return returns true if replacement was succesful, false if it wasn't or the address didn't contain the expected initial value
+ */
 bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_final, const char *debug_prefix, const char *SETTING_ID);
 
 bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_final, const char *debug_prefix, const char *SETTING_ID) {

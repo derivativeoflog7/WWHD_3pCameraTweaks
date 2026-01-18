@@ -17,6 +17,11 @@ typedef struct {
     };
 } PatchArrayElement;
 
+/**
+ * Retrieve the pointer to the BasePatch of a patch inside a PatchArrayElement
+ * @param element_p Pointer to the PatchArrayElement
+ * @return Pointer to the BasePatch
+ */
 BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
 
 #define GENERATE_SIMPLE_REPLACEMENT_PATCH_ENTRY( \

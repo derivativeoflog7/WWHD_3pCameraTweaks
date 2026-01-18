@@ -9,6 +9,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * Logs FunctionPatcherStatus, returns true if it's FUNCTION_PATCHER_RESULT_SUCCESS and false otherwise
+ * @param function_patcher_status FunctionPatcherStatus to check and log
+ * @param SETTING_ID setting_id for the debug message
+ * @param debug_prefix debug_prefix for the debug message
+ * @return true if FUNCTION_PATCHER_RESULT_SUCCESS, false otherwise
+ */
 bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix);
 
 bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix) {
