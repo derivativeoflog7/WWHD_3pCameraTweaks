@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010143600,0005000010143500,0005000010143400
+name = Consistent 3rd person camera Y axis
+path = "The Legend of Zelda: The Wind Waker HD/3rd person camera tweaks/Consistent Y axis"
+description = Prevent the game from inverting the Y axis of the third person camera in certain locations
+version = 6

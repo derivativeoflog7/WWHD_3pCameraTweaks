@@ -20,27 +20,37 @@ WUMS_ROOT := $(DEVKITPRO)/wums
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #-------------------------------------------------------------------------------
-TARGET		:=	WWHD_invert3pYaxis
+TARGET		:=	WWHD_3pCameraTweaks
 BUILD		:=	build
-SOURCES		:=	src src/utils
+SOURCES		:=	src src/utils src/patches
 DATA		:=	data
 INCLUDES	:=	src
 
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
-#OPT	:=  -Os -fno-asynchronous-unwind-tables
-CFLAGS	:=	-g -O2 -Wall -ffunction-sections -fdata-sections \
+OPT	:=  	-fno-asynchronous-unwind-tables -O2
+CFLAGS	:=	-g -Wall -ffunction-sections -fdata-sections \
 			$(MACHDEP) $(OPT)
 
-CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__ 
+CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__  -std=gnu23
 
-CXXFLAGS	:= $(CFLAGS) -std=c++20
+CXXFLAGS	:= $(CFLAGS) 
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(OPT) $(RPXSPECS) -Wl,-Map,$(notdir $*.map) $(WUPSSPECS) -Wl,-gc-sections,-T$(WUMS_ROOT)/share/libkernel.ld
 
-LIBS	:= -lwups -lwut -lkernel
+LIBS	:= 	-lwups -lwut -lkernel -lfunctionpatcher
+
+ifeq ($(DEBUG),1)
+CXXFLAGS += -DDEBUG -g
+CFLAGS += -DDEBUG -g
+endif
+
+ifeq ($(DEBUG),VERBOSE)
+CXXFLAGS += -DDEBUG -DVERBOSE_DEBUG -g
+CFLAGS += -DDEBUG -DVERBOSE_DEBUG -g
+endif
 
 #-------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level

@@ -1,14 +1,15 @@
 ## Usage
-The plugin can be enabled/disabled via the WUPS Config menu (press L, DPAD Down and Minus on the GamePad, Pro Controller or Classic Controller).  
-The Config menu will also show the current status, and will indicate if patching has failed for some reason.
+The various patches can be enabled/disabled via the WUPS Config menu (press L, DPAD Down and Minus on the GamePad, Pro Controller or Classic Controller).  
 
 ## Installation
 
 (`[ENVIRONMENT]` is a placeholder for the actual environment name.)
 
-1. Copy the file `WWHD_invert3pYaxis.wps` into `sd:/wiiu/environments/[ENVIRONMENT]/plugins`.
+1. Copy the file `WWHD_3pCameraTweaks.wps` into `sd:/wiiu/environments/[ENVIRONMENT]/plugins`.
 2. Requires the [WiiUPluginLoaderBackend](https://github.com/wiiu-env/WiiUPluginLoaderBackend) in `sd:/wiiu/environments/[ENVIRONMENT]/modules`.
+3. Requires the [FunctionPatcherModule](https://github.com/wiiu-env/FunctionPatcherModule/) in `sd:/wiiu/environments/[ENVIRONMENT]/modules`.
 
+**NOTE: both modules are already included in a standard [base Aroma](https://aroma.foryour.cafe/) install.**
 Start the environment (e.g Aroma) and the backend should load the plugin.
 
 ## Building
@@ -18,10 +19,11 @@ For building you need:
 - [wups](https://github.com/Maschell/WiiUPluginSystem)
 - [wut](https://github.com/devkitpro/wut)
 - [libkernel](https://github.com/wiiu-env/libkernel)
+- [libfunctionpatcher](https://github.dev/wiiu-env/libfunctionpatcher)
 
 Install them (in this order) according to their README's. Don't forget the dependencies of the libs itself.
 
-Then you should be able to compile via `make` (with no logging) or `make DEBUG=1` (with logging).
+Then you should be able to compile via `make` (with no logging), `make DEBUG=1` (with logging) or `make DEBUG=VERBOSE` (with verbose logging).
 
 ### Logging
 
@@ -39,11 +41,11 @@ It's possible to use a docker image for building. This way you don't need anythi
 
 ```
 # Build docker image (only needed once)
-docker build . -t example-plugin-builder
+docker build . -t wwhd_3pcameratweaks-builder
 
 # make 
-docker run -it --rm -v ${PWD}:/project example-plugin-builder make
+docker run -it --rm -v ${PWD}:/project WWHD_3pCameraTweaks-builder make
 
 # make clean
-docker run -it --rm -v ${PWD}:/project example-plugin-builder make clean
+docker run -it --rm -v ${PWD}:/project WWHD_3pCameraTweaks-builder make clean
 ```
