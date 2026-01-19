@@ -83,26 +83,10 @@ bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rp
 
     if (base_patch_data_p->is_enabled) {
         // Apply
-        uint32_t offset;
-
-        switch (region) {
-            case JPN:
-                offset = base_patch_data_p->OFFSET_JPN;
-                break;
-            case USA:
-                offset = base_patch_data_p->OFFSET_USA;
-                break;
-            case EUR:
-                offset = base_patch_data_p->OFFSET_EUR;
-                break;
-            default:
-                return false;
-        }
-
         debug_prefix = APPLY;
         exp_initial = patch_p->ORIGINAL_INSTRUCTION;
         exp_final = patch_p->REPLACEMENT_INSTRUCTION;
-        address_p = (uint32_t*)(rpl_text_address + offset);
+        address_p = (uint32_t*)(rpl_text_address + base_patch_data_p->OFFSETS[region]);
     } else {
         // Undo
         debug_prefix = UNDO;

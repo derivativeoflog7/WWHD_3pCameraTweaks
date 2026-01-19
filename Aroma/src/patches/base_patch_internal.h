@@ -1,4 +1,5 @@
 #pragma once
+#include "../common.h"
 #include "base_patch.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -18,9 +19,9 @@ bool already_done(BasePatch base_patch_data);
         .SETTING_ID = (setting_id), \
         .MENU_TEXT = (menu_text), \
         .IS_ENABLED_DEFAULT = (is_enabled_default), \
-        .OFFSET_JPN = (offset_jpn), \
-        .OFFSET_USA = (offset_usa), \
-        .OFFSET_EUR = (offset_eur), \
+        .OFFSETS[JPN] = (offset_jpn), \
+        .OFFSETS[USA] = (offset_usa), \
+        .OFFSETS[EUR] = (offset_eur), \
         .is_enabled = false, .is_applied = false \
     } \
 )

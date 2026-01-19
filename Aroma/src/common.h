@@ -33,5 +33,6 @@
 #define CONSISTENT_3P_Y_AXIS_ORIGINAL_INSTRUCTION 0xC19F0174 // lfs f12, +0x174(r31)
 
 typedef enum {
-    JPN, USA, EUR
+    JPN=0, USA, EUR, NUM_REGIONS
 } Region;
+
