@@ -60,60 +60,62 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
                 (setting_id), (menu_text), (is_enabled_default), \
                 (offset_jpn), (offset_usa), (offset_eur) \
             ), \
-            .function_replacement_data_JPN = (function_replacement_data_t) { \
-                .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
-                .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
-                .physicalAddr  = 0, /*Unused*/ \
-                .virtualAddr   = 0, /*Unused*/ \
-                .replaceAddr   = (uint32_t)&(replacement_function), /*Address of replacement function*/ \
-                .replaceCall   = &(replace_call_variable), /*Pointer to code containing original instruction + jump back to original code*/ \
-                .targetProcess = FP_TARGET_PROCESS_ALL, \
-                .ReplaceInRPX  = { \
-                    .targetTitleIds      = (uint64_t[]){(tid_jpn)}, \
-                    .targetTitleIdsCount = 1, \
-                    .versionMin          = 0, /*Ignore version as WWHD was never updated anyway*/ \
-                    .versionMax          = 0xFFFF, /*Same as above*/ \
-                    .executableName      = (executable_name), \
-                    .textOffset          = (offset_jpn), \
-                    .functionName        = NULL /*Unused*/ \
-                } \
-            }, \
-            .function_replacement_data_USA = (function_replacement_data_t) { \
-                .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
-                .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
-                .physicalAddr  = 0, /*Unused*/ \
-                .virtualAddr   = 0, /*Unused*/ \
-                .replaceAddr   = (uint32_t)&(replacement_function), \
-                .replaceCall   = &(replace_call_variable), \
-                .targetProcess = FP_TARGET_PROCESS_ALL, \
-                .ReplaceInRPX  = { \
-                    .targetTitleIds      = (uint64_t[]){(tid_usa)}, \
-                    .targetTitleIdsCount = 1, \
-                    .versionMin          = 0, /* Ignore version as WWHD was never updated anyway*/ \
-                    .versionMax          = 0xFFFF, \
-                    .executableName      = (executable_name), \
-                    .textOffset          = (offset_usa), \
-                    .functionName        = NULL /*Unused*/ \
-                } \
-            }, \
-            .function_replacement_data_EUR = (function_replacement_data_t) { \
-                .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
-                .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
-                .physicalAddr  = 0, /*Unused*/ \
-                .virtualAddr   = 0, /*Unused*/ \
-                .replaceAddr   = (uint32_t)&(replacement_function), \
-                .replaceCall   = &(replace_call_variable), \
-                .targetProcess = FP_TARGET_PROCESS_ALL, \
-                .ReplaceInRPX  = { \
-                    .targetTitleIds      = (uint64_t[]){(tid_eur)}, \
-                    .targetTitleIdsCount = 1, \
-                    .versionMin          = 0, /* Ignore version as WWHD was never updated anyway*/ \
-                    .versionMax          = 0xFFFF, \
-                    .executableName      = (executable_name), \
-                    .textOffset          = (offset_eur), \
-                    .functionName        = NULL /*Unused*/ \
-                } \
-            }, \
+            .function_replacement_data = (function_replacement_data_t[]) { \
+                [JPN] = (function_replacement_data_t) { \
+                    .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
+                    .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
+                    .physicalAddr  = 0, /*Unused*/ \
+                    .virtualAddr   = 0, /*Unused*/ \
+                    .replaceAddr   = (uint32_t)&(replacement_function), /*Address of replacement function*/ \
+                    .replaceCall   = &(replace_call_variable), /*Pointer to code containing original instruction + jump back to original code*/ \
+                    .targetProcess = FP_TARGET_PROCESS_ALL, \
+                    .ReplaceInRPX  = { \
+                        .targetTitleIds      = (uint64_t[]){(tid_jpn)}, \
+                        .targetTitleIdsCount = 1, \
+                        .versionMin          = 0, /*Ignore version as WWHD was never updated anyway*/ \
+                        .versionMax          = 0xFFFF, /*Same as above*/ \
+                        .executableName      = (executable_name), \
+                        .textOffset          = (offset_jpn), \
+                        .functionName        = NULL /*Unused*/ \
+                    } \
+                }, \
+                [USA] = (function_replacement_data_t) { \
+                    .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
+                    .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
+                    .physicalAddr  = 0, \
+                    .virtualAddr   = 0, \
+                    .replaceAddr   = (uint32_t)&(replacement_function), \
+                    .replaceCall   = &(replace_call_variable), \
+                    .targetProcess = FP_TARGET_PROCESS_ALL, \
+                    .ReplaceInRPX  = { \
+                        .targetTitleIds      = (uint64_t[]){(tid_usa)}, \
+                        .targetTitleIdsCount = 1, \
+                        .versionMin          = 0, \
+                        .versionMax          = 0xFFFF, \
+                        .executableName      = (executable_name), \
+                        .textOffset          = (offset_usa), \
+                        .functionName        = NULL \
+                    } \
+                }, \
+                [EUR] = (function_replacement_data_t) { \
+                    .version       = FUNCTION_REPLACEMENT_DATA_STRUCT_VERSION, \
+                    .type          = FUNCTION_PATCHER_REPLACE_FOR_EXECUTABLE_BY_ADDRESS, \
+                    .physicalAddr  = 0, \
+                    .virtualAddr   = 0, \
+                    .replaceAddr   = (uint32_t)&(replacement_function), \
+                    .replaceCall   = &(replace_call_variable), \
+                    .targetProcess = FP_TARGET_PROCESS_ALL, \
+                    .ReplaceInRPX  = { \
+                        .targetTitleIds      = (uint64_t[]){(tid_eur)}, \
+                        .targetTitleIdsCount = 1, \
+                        .versionMin          = 0, \
+                        .versionMax          = 0xFFFF, \
+                        .executableName      = (executable_name), \
+                        .textOffset          = (offset_eur), \
+                        .functionName        = NULL \
+                    } \
+                }, \
+            } \
         } \
     } \
 )

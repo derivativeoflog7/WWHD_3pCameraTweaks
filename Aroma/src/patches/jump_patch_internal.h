@@ -4,9 +4,9 @@
 #include <stdbool.h>
 
 /**
- * Apply/undo a JumpPatch, depending on its is_enabled and is_applied values, given the  region to pick the offset
+ * Apply/undo a JumpPatch, depending on its is_enabled and is_applied values, given the region to pick the patch
  * @param patch_p Pointer to JumpPatch, updating is_applied in case of success
- * @param region Region to pick the offset
+ * @param region Region to pick the patch
  * @return Boolean indicating if the patch was applied succesfully (also returns true if is_enabled and is_applied already match)
  * @see get_rpl_text_address
  */

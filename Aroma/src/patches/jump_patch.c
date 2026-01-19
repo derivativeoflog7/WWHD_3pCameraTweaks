@@ -6,6 +6,7 @@
 #include "patches_common_internal.h"
 #include "patch_strings_internal.h"
 #include <function_patcher/function_patching.h>
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -55,26 +56,11 @@ bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, co
 }
 
 bool apply_jump_patch(JumpPatch *patch_p, Region region) {
+    assert(region < NUM_REGIONS);
     BasePatch *base_patch_data_p = &patch_p->base_patch_data;
 
     if (already_done(*base_patch_data_p))
         return true;
-
-    function_replacement_data_t *target_function_replacement_data;
-
-    switch (region) {
-        case JPN:
-            target_function_replacement_data = &patch_p->function_replacement_data_JPN;
-            break;
-        case USA:
-            target_function_replacement_data = &patch_p->function_replacement_data_USA;
-            break;
-        case EUR:
-            target_function_replacement_data = &patch_p->function_replacement_data_EUR;
-            break;
-        default:
-            return false;
-    }
 
     FunctionPatcherStatus res;
     char *debug_prefix;
@@ -82,7 +68,7 @@ bool apply_jump_patch(JumpPatch *patch_p, Region region) {
         // Apply
         debug_prefix = APPLY;
         DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, base_patch_data_p->SETTING_ID);
-        res = FunctionPatcher_AddFunctionPatch(target_function_replacement_data, &patch_p->patched_function_handle, &base_patch_data_p->is_applied);
+        res = FunctionPatcher_AddFunctionPatch(&patch_p->function_replacement_data[region], &patch_p->patched_function_handle, &base_patch_data_p->is_applied);
     } else {
         // Undo
         debug_prefix = UNDO;
