@@ -9,8 +9,8 @@
 
 #define APPLY                                               "Applying"
 #define UNDO                                                "Undoing"
-#define DEBUG_MESSAGE_SUCCESS                               "%s %s succeeded"
-#define FAIL                                                "%s %s FAILED! "
+#define DEBUG_MESSAGE_PATCH_SUCCEEDED                       "%s %s succeeded"
+#define DEBUG_MESSAGE_PATCH_FAILED                          "%s %s FAILED! "
 #define DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH        "%s simple replacement patch %s at address %08x"
 #define DEBUG_MESSAGE_DOING_JUMP_PATCH                      "%s jump patch patch %s"
 #define DEBUG_MESSAGE_RESETTING_IS_APPLIED                  "Resetting is_applied for %s"
@@ -24,9 +24,9 @@
 #define DEBUG_MESSAGE_PHYSICAL_ADDRESS                      "Physical address is %08x"
 #define DEBUG_MESSAGE_NEW_VALUE_AT_ADDRESS                  "%08x is now %08x"
 #define _MISMATCH                                           "; expected %08x found %08x"
-#define DEBUG_MESSAGE_FAIL_ORIGINAL_VALUE_MISMATCH FAIL     "Original value mismatch" _MISMATCH
-#define DEBUG_MESSAGE_FAIL_VALUE_NOT_UPDATED FAIL           "Value did not update" _MISMATCH
-#define DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS FAIL        "patched_instruction_address is NULL"
+#define DEBUG_MESSAGE_FAIL_ORIGINAL_VALUE_MISMATCH          "Original value mismatch!" _MISMATCH
+#define DEBUG_MESSAGE_FAIL_VALUE_NOT_UPDATED                "Value did not update!" _MISMATCH
+#define DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS             "patched_instruction_address is NULL!"
 
-#define DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR FAIL      "FunctionPatcher returned %s"
+#define DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED             "FunctionPatcher returned %s"
 

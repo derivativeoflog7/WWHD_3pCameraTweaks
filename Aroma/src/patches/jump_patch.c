@@ -13,43 +13,41 @@
 /**
  * Logs FunctionPatcherStatus, returns true if it's FUNCTION_PATCHER_RESULT_SUCCESS and false otherwise
  * @param function_patcher_status FunctionPatcherStatus to check and log
- * @param SETTING_ID setting_id for the debug message
- * @param debug_prefix debug_prefix for the debug message
  * @return true if FUNCTION_PATCHER_RESULT_SUCCESS, false otherwise
  */
-bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix);
+bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status);
 
-bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status, const char *SETTING_ID, const char *debug_prefix) {
+bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status) {
     switch (function_patcher_status) {
         case FUNCTION_PATCHER_RESULT_SUCCESS:
-            DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_SUCCESS, debug_prefix, SETTING_ID);
+            DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_SUCCESS");
             return true;
         case FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_MODULE_NOT_FOUND");
             break;
         case FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_MODULE_MISSING_EXPORT");
             break;
         case FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_VERSION");
             break;
         case FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_INVALID_ARGUMENT");
             break;
         case FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_PATCH_NOT_FOUND");
             break;
         case FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_STRUCT_VERSION");
             break;
         case FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_LIB_UNINITIALIZED");
             break;
         case FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_UNSUPPORTED_COMMAND");
             break;
         case FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR:
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_FUNCTION_PATCHER_ERROR, debug_prefix, SETTING_ID, "FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR");
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FUNCTION_PATCHER_RETURNED, "FUNCTION_PATCHER_RESULT_UNKNOWN_ERROR");
             break;
     }
     return false;
@@ -77,7 +75,10 @@ bool apply_jump_patch(JumpPatch *patch_p, Region region) {
             base_patch_data_p->is_applied = false;
     }
 
-    return jump_patch_return_and_log(res, base_patch_data_p->SETTING_ID, debug_prefix);
+    if (jump_patch_return_and_log(res))
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, base_patch_data_p->SETTING_ID);
+    else
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, base_patch_data_p->SETTING_ID);
 }
 
 bool force_undo_jump_patch(JumpPatch *patch_p) {
@@ -92,5 +93,5 @@ bool force_undo_jump_patch(JumpPatch *patch_p) {
     if ((res = FunctionPatcher_RemoveFunctionPatch(patch_p->patched_function_handle)) == FUNCTION_PATCHER_RESULT_SUCCESS)
         base_patch_data_p->is_applied = false;
 
-    return jump_patch_return_and_log(res, base_patch_data_p->SETTING_ID, UNDO);
+    return jump_patch_return_and_log(res);
 }

@@ -50,7 +50,7 @@ bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_
 bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_final, const char *debug_prefix, const char *SETTING_ID) {
     // Check if initial value matches expected one
     if (*address_p != exp_initial) {
-        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_ORIGINAL_VALUE_MISMATCH, debug_prefix, SETTING_ID, exp_initial, *address_p);
+        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_ORIGINAL_VALUE_MISMATCH, exp_initial, *address_p);
         return false;
     }
 
@@ -64,7 +64,7 @@ bool replace_at_address(uint32_t *address_p, uint32_t exp_initial, uint32_t exp_
 
     // Check if final value matches expected one
     if (*address_p != exp_final) {
-        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_VALUE_NOT_UPDATED, debug_prefix, SETTING_ID, exp_final, *address_p);
+        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_VALUE_NOT_UPDATED, exp_final, *address_p);
         return false;
     }
 
@@ -93,7 +93,7 @@ bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rp
         exp_initial = patch_p->REPLACEMENT_INSTRUCTION;
         exp_final = patch_p->ORIGINAL_INSTRUCTION;
         if (!patch_p->patched_instruction_address) {
-            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS, debug_prefix, base_patch_data_p->SETTING_ID);
+            DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS);
             return false;
         }
         address_p = patch_p->patched_instruction_address;
@@ -126,7 +126,7 @@ bool force_undo_simple_replacement_patch(SimpleReplacementPatch *patch_p) {
     }
 
     if (!patch_p->patched_instruction_address) {
-        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS, UNDO, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_FAIL_NULL_PATCHED_ADDRESS);
         return false;
     }
 
