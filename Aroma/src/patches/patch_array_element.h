@@ -1,6 +1,7 @@
 #pragma once
 #include "base_patch.h"
 #include "base_patch_internal.h"
+#include "replacement_data_internal.h"
 #include "simple_replacement_patch.h"
 #include "jump_patch.h"
 #include <stdbool.h>
@@ -28,18 +29,18 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
 #define GENERATE_SIMPLE_REPLACEMENT_PATCH_ENTRY( \
     setting_id, menu_text, is_enabled_default, \
     offset_jpn, offset_usa, offset_eur, \
-    original_instruction, replacement_instruction \
+    original_value, replacement_value \
 ) ( \
     (PatchArrayElement) { \
         .patch_type = SIMPLE_REPLACEMENT_PATCH, \
         .simple_replacement_patch = (SimpleReplacementPatch) { \
-            .base_patch_data = _GENERATE_BASE_PATCH_ENTRY( \
-                (setting_id), (menu_text), (is_enabled_default), \
-                (offset_jpn), (offset_usa), (offset_eur) \
+            .base_patch_data = _GENERATE_BASE_PATCH_DATA( \
+                (setting_id), (menu_text), (is_enabled_default) \
             ), \
-            .ORIGINAL_INSTRUCTION = (original_instruction), \
-            .REPLACEMENT_INSTRUCTION = (replacement_instruction), \
-            .patched_instruction_address = NULL \
+            .replacement_data = _GENERATE_REPLACEMENT_DATA( \
+                (offset_jpn), (offset_usa), (offset_eur), \
+                (original_value), (replacement_value) \
+            ) \
         } \
     } \
 )
@@ -56,9 +57,8 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
     (PatchArrayElement) { \
         .patch_type = JUMP_PATCH, \
         .jump_patch = (JumpPatch) { \
-            .base_patch_data = _GENERATE_BASE_PATCH_ENTRY( \
-                (setting_id), (menu_text), (is_enabled_default), \
-                (offset_jpn), (offset_usa), (offset_eur) \
+            .base_patch_data = _GENERATE_BASE_PATCH_DATA( \
+                (setting_id), (menu_text), (is_enabled_default) \
             ), \
             .function_replacement_data = (function_replacement_data_t[]) { \
                 [JPN] = (function_replacement_data_t) { \

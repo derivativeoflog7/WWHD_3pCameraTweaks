@@ -1,6 +1,5 @@
 #pragma once
 #include "simple_replacement_patch.h"
-#include <stdbool.h>
 #include <stdint.h>
 
 /**

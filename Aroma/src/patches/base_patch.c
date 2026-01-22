@@ -2,7 +2,6 @@
 #include "base_patch.h"
 #include "base_patch_internal.h"
 #include "patch_strings_internal.h"
-#include <stdbool.h>
 
 bool already_done(BasePatch base_patch_data) {
     if (base_patch_data.is_enabled && base_patch_data.is_applied) {

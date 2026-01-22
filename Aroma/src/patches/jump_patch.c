@@ -75,10 +75,12 @@ bool apply_jump_patch(JumpPatch *patch_p, Region region) {
             base_patch_data_p->is_applied = false;
     }
 
-    if (jump_patch_return_and_log(res))
+    bool res2 = jump_patch_return_and_log(res);
+    if (res2)
         DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, base_patch_data_p->SETTING_ID);
     else
         DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, base_patch_data_p->SETTING_ID);
+    return res2;
 }
 
 bool force_undo_jump_patch(JumpPatch *patch_p) {
