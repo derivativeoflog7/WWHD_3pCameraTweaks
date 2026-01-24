@@ -25,8 +25,8 @@
 
 #include "../utils/logger.h"
 #include "../common.h"
-#include "base_patch.h"
-#include "base_patch_internal.h"
+#include "setting_entry.h"
+#include "setting_entry_internal.h"
 #include "patch_strings_internal.h"
 #include "replacement_data_internal.h"
 #include "simple_replacement_patch.h"
@@ -38,55 +38,55 @@
 #include <stdint.h>
 
 bool apply_simple_replacement_patch(SimpleReplacementPatch *patch_p, uint32_t rpl_text_address, Region region) {
-    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+    SettingEntry *setting_entry_p = &patch_p->setting_entry;
 
-    if (already_done(*base_patch_data_p))
+    if (already_done(*setting_entry_p))
         return true;
 
     char *debug_prefix;
     bool res;
 
-    if (base_patch_data_p->is_enabled) {
+    if (setting_entry_p->is_enabled) {
         // Apply
         debug_prefix = APPLY;
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, APPLY, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, APPLY, setting_entry_p->setting_id);
         res = apply_replacement(&patch_p->replacement_data, rpl_text_address, region);
         if (res)
-            base_patch_data_p->is_applied = true;
+            setting_entry_p->is_applied = true;
     } else {
         // Undo
         debug_prefix = UNDO;
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, UNDO, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, UNDO, setting_entry_p->setting_id);
         res = undo_replacement(&patch_p->replacement_data);
         if (res)
-            base_patch_data_p->is_applied = false;
+            setting_entry_p->is_applied = false;
     }
 
     if (res) {
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, setting_entry_p->setting_id);
         return true;
     } else {
-        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, setting_entry_p->setting_id);
         return false;
     }
 }
 
 bool force_undo_simple_replacement_patch(SimpleReplacementPatch *patch_p) {
-    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+    SettingEntry *setting_entry_p = &patch_p->setting_entry;
 
-    if (!base_patch_data_p->is_applied) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_NOT_APPLIED, base_patch_data_p->SETTING_ID);
+    if (!setting_entry_p->is_applied) {
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_NOT_APPLIED, setting_entry_p->setting_id);
         return true;
     }
 
-    DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, UNDO, base_patch_data_p->SETTING_ID);
+    DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_DOING_SIMPLE_REPLACEMENT_PATCH, UNDO, setting_entry_p->setting_id);
 
     if (undo_replacement(&patch_p->replacement_data)) {
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, UNDO, base_patch_data_p->SETTING_ID);
-        base_patch_data_p->is_applied = false;
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, UNDO, setting_entry_p->setting_id);
+        setting_entry_p->is_applied = false;
         return true;
     } else {
-        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_PATCH_FAILED, UNDO, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_ERR(DEBUG_MESSAGE_PATCH_FAILED, UNDO, setting_entry_p->setting_id);
         return false;
     }
 }

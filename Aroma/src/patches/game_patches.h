@@ -1,5 +1,5 @@
 #pragma once
-#include "base_patch.h"
+#include "setting_entry.h"
 #include "jump_patch.h"
 #include "patch_array_element.h"
 #include "patch_array_element_internal.h"

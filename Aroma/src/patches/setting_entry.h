@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 typedef struct {
-    const char *SETTING_ID, *MENU_TEXT;
-    const bool IS_ENABLED_DEFAULT;
+    const char *setting_id, *menu_text;
+    const bool is_enabled_default;
     bool is_enabled, is_applied;
-} BasePatch;
+} SettingEntry;

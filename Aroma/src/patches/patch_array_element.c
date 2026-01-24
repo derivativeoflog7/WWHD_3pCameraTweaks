@@ -1,5 +1,5 @@
 #include "../utils/logger.h"
-#include "base_patch.h"
+#include "setting_entry.h"
 #include "jump_patch_internal.h"
 #include "patch_array_element.h"
 #include "patch_array_element_internal.h"
@@ -7,12 +7,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-inline BasePatch *get_base_patch_data_p (PatchArrayElement *element_p) {
+inline SettingEntry *get_setting_entry_p (PatchArrayElement *element_p) {
     switch (element_p->patch_type) {
         case SIMPLE_REPLACEMENT_PATCH:
-            return &element_p->simple_replacement_patch.base_patch_data;
+            return &element_p->simple_replacement_patch.setting_entry;
         case JUMP_PATCH:
-            return &element_p->jump_patch.base_patch_data;
+            return &element_p->jump_patch.setting_entry;
     }
 
     return NULL; //gcc complains otherwise

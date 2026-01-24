@@ -1,9 +1,9 @@
 #pragma once
-#include "base_patch.h"
+#include "setting_entry.h"
 #include "replacement_data_internal.h"
 #include <stdint.h>
 
 typedef struct {
-    BasePatch base_patch_data;
+    SettingEntry setting_entry;
     ReplacementData replacement_data;
 } SimpleReplacementPatch;

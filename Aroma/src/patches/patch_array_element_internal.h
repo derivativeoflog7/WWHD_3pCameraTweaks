@@ -1,6 +1,6 @@
 #pragma once
 #include "../common.h"
-#include "base_patch.h"
+#include "setting_entry.h"
 #include "patch_array_element.h"
 #include <stdbool.h>
 #include <stdint.h>

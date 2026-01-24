@@ -1,6 +1,6 @@
 #pragma once
-#include "base_patch.h"
-#include "base_patch_internal.h"
+#include "setting_entry.h"
+#include "setting_entry_internal.h"
 #include "replacement_data_internal.h"
 #include "simple_replacement_patch.h"
 #include "jump_patch.h"
@@ -20,11 +20,11 @@ typedef struct {
 } PatchArrayElement;
 
 /**
- * Retrieve the pointer to the BasePatch of a patch inside a PatchArrayElement
+ * Retrieve the pointer to the SettingEntry of a patch inside a PatchArrayElement
  * @param element_p Pointer to the PatchArrayElement
- * @return Pointer to the BasePatch
+ * @return Pointer to the SettingEntry
  */
-BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
+SettingEntry *get_setting_entry_p (PatchArrayElement *element_p);
 
 #define GENERATE_SIMPLE_REPLACEMENT_PATCH_ENTRY( \
     setting_id, menu_text, is_enabled_default, \
@@ -34,7 +34,7 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
     (PatchArrayElement) { \
         .patch_type = SIMPLE_REPLACEMENT_PATCH, \
         .simple_replacement_patch = (SimpleReplacementPatch) { \
-            .base_patch_data = _GENERATE_BASE_PATCH_DATA( \
+            .setting_entry = GENERATE_SETTING_ENTRY( \
                 (setting_id), (menu_text), (is_enabled_default) \
             ), \
             .replacement_data = _GENERATE_REPLACEMENT_DATA( \
@@ -57,7 +57,7 @@ BasePatch *get_base_patch_data_p (PatchArrayElement *element_p);
     (PatchArrayElement) { \
         .patch_type = JUMP_PATCH, \
         .jump_patch = (JumpPatch) { \
-            .base_patch_data = _GENERATE_BASE_PATCH_DATA( \
+            .setting_entry = GENERATE_SETTING_ENTRY( \
                 (setting_id), (menu_text), (is_enabled_default) \
             ), \
             .function_replacement_data = (function_replacement_data_t[]) { \

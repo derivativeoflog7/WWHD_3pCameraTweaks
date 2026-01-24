@@ -1,5 +1,5 @@
 #include "../utils/logger.h"
-#include "base_patch.h"
+#include "setting_entry.h"
 #include "game_patches.h"
 #include "jump_patch.h"
 #include "jump_patch_internal.h"
@@ -43,8 +43,8 @@ int force_undo_game_paches(GamePatches *game_patches_p) {
 
 void unset_is_applied(GamePatches *game_patches_p) {
     for (int i = 0; i < game_patches_p->NUM_PATCHES; i++) {
-        BasePatch *base_patch_data_p = get_base_patch_data_p(&game_patches_p->patches[i]);
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_RESETTING_IS_APPLIED, base_patch_data_p->SETTING_ID);
+        SettingEntry *setting_entry_p = get_setting_entry_p(&game_patches_p->patches[i]);
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_RESETTING_IS_APPLIED, setting_entry_p->setting_id);
         // If the patch is a jump patch, also remove it, as FunctionPatcher would just stack new additions over the already patched code and cause a mess
         // FunctionPatcher is smart enough to have multiple patches active at the same time and actually perform them only when the matching title is launched,
         // but I don't want to spend a day rewiring all logic and figuring how how to put everything together,
@@ -52,6 +52,6 @@ void unset_is_applied(GamePatches *game_patches_p) {
         if (game_patches_p->patches[i].patch_type == JUMP_PATCH)
             force_undo_jump_patch(&game_patches_p->patches[i].jump_patch);
         else
-            base_patch_data_p->is_applied = false;
+            setting_entry_p->is_applied = false;
     }
 }

@@ -1,6 +1,6 @@
 #include "../utils/logger.h"
-#include "base_patch.h"
-#include "base_patch_internal.h"
+#include "setting_entry.h"
+#include "setting_entry_internal.h"
 #include "jump_patch.h"
 #include "jump_patch_internal.h"
 #include "patches_common_internal.h"
@@ -55,45 +55,45 @@ bool jump_patch_return_and_log(FunctionPatcherStatus function_patcher_status) {
 
 bool apply_jump_patch(JumpPatch *patch_p, Region region) {
     assert(region < NUM_REGIONS);
-    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+    SettingEntry *setting_entry_p = &patch_p->setting_entry;
 
-    if (already_done(*base_patch_data_p))
+    if (already_done(*setting_entry_p))
         return true;
 
     FunctionPatcherStatus res;
     char *debug_prefix;
-    if (base_patch_data_p->is_enabled) {
+    if (setting_entry_p->is_enabled) {
         // Apply
         debug_prefix = APPLY;
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, base_patch_data_p->SETTING_ID);
-        res = FunctionPatcher_AddFunctionPatch(&patch_p->function_replacement_data[region], &patch_p->patched_function_handle, &base_patch_data_p->is_applied);
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, setting_entry_p->setting_id);
+        res = FunctionPatcher_AddFunctionPatch(&patch_p->function_replacement_data[region], &patch_p->patched_function_handle, &setting_entry_p->is_applied);
     } else {
         // Undo
         debug_prefix = UNDO;
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_DOING_JUMP_PATCH, debug_prefix, setting_entry_p->setting_id);
         if ((res = FunctionPatcher_RemoveFunctionPatch(patch_p->patched_function_handle)) == FUNCTION_PATCHER_RESULT_SUCCESS)
-            base_patch_data_p->is_applied = false;
+            setting_entry_p->is_applied = false;
     }
 
     bool res2 = jump_patch_return_and_log(res);
     if (res2)
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_SUCCEEDED, debug_prefix, setting_entry_p->setting_id);
     else
-        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, base_patch_data_p->SETTING_ID);
+        DEBUG_FUNCTION_LINE_INFO(DEBUG_MESSAGE_PATCH_FAILED, debug_prefix, setting_entry_p->setting_id);
     return res2;
 }
 
 bool force_undo_jump_patch(JumpPatch *patch_p) {
-    BasePatch *base_patch_data_p = &patch_p->base_patch_data;
+    SettingEntry *setting_entry_p = &patch_p->setting_entry;
 
-    if (!base_patch_data_p->is_applied) {
-        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_NOT_APPLIED, base_patch_data_p->SETTING_ID);
+    if (!setting_entry_p->is_applied) {
+        DEBUG_FUNCTION_LINE_VERBOSE(DEBUG_MESSAGE_NOT_APPLIED, setting_entry_p->setting_id);
         return true;
     }
 
     FunctionPatcherStatus res;
     if ((res = FunctionPatcher_RemoveFunctionPatch(patch_p->patched_function_handle)) == FUNCTION_PATCHER_RESULT_SUCCESS)
-        base_patch_data_p->is_applied = false;
+        setting_entry_p->is_applied = false;
 
     return jump_patch_return_and_log(res);
 }
