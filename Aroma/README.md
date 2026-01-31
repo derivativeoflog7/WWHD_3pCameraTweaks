@@ -19,7 +19,7 @@ For building you need:
 - [wut](https://github.com/devkitpro/wut)
 - [wups](https://github.com/Maschell/WiiUPluginSystem)
 - [libkernel](https://github.com/wiiu-env/libkernel)
-- [libfunctionpatcher](https://github.dev/wiiu-env/libfunctionpatcher)
+- [libfunctionpatcher](https://github.com/wiiu-env/libfunctionpatcher)
 
 Install them (in this order) according to their README's. Don't forget the dependencies of the libs itself.
 
