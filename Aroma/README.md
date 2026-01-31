@@ -16,8 +16,8 @@ Start the environment (e.g Aroma) and the backend should load the plugin.
 
 For building you need:
 
-- [wups](https://github.com/Maschell/WiiUPluginSystem)
 - [wut](https://github.com/devkitpro/wut)
+- [wups](https://github.com/Maschell/WiiUPluginSystem)
 - [libkernel](https://github.com/wiiu-env/libkernel)
 - [libfunctionpatcher](https://github.dev/wiiu-env/libfunctionpatcher)
 
